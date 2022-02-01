@@ -2,11 +2,12 @@ package loglevels
 
 import (
 	"log"
+	"strings"
 )
 
 // LoggingLevel is a syntax-sugar kind of type just for better readability
 // for functions
-type LoggingLevel uint8
+type LoggingLevel int8
 
 const (
 	// DEBUG is the lowest logging level. Only devs should really care about it
@@ -25,7 +26,7 @@ const (
 var currentLevel = DEBUG
 
 func (l *LoggingLevel) String() string {
-	return []string{"Debug", "Info", "Warning", "Error"}[*l]
+	return []string{"debug", "info", "warning", "error"}[*l]
 }
 
 // SetLevel changes
@@ -38,23 +39,22 @@ func Level() LoggingLevel {
 	return currentLevel
 }
 
-// Debug is a function for DEBUG logging level
+// Debug calls Output with a DEBUG logging level
 func Debug(format string, v ...string) {
 	if currentLevel < INFO {
 		return
 	}
-	output(DEBUG, format, v)
+	Output(DEBUG, format, v)
 }
 
-// Info is a function for INFO logging level
-func Info(format string, v ...string) {
-	if currentLevel < INFO {
-		return
+// Output sends formatted string to a default logger (without level checking!)
+// In case you don't want to print any prefixes, set `level` to negative
+func Output(level LoggingLevel, format string, v ...interface{}) {
+	var sb strings.Builder
+	if level >= DEBUG {
+		sb.WriteString(level.String())
+		sb.WriteByte(':')
 	}
-	log.Printf(format, v)
-}
-
-func output(level LoggingLevel, format string, v ...interface{}) {
-	// var sb strings.Builder
-	// TODO
+	sb.WriteString(format)
+	log.Printf(sb.String(), v...)
 }
