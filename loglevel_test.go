@@ -11,50 +11,12 @@ import (
 const defaultLevel = DEBUG
 
 func TestStringer(t *testing.T) {
-	levels := []LoggingLevel{DEBUG, INFO, WARNING, ERROR}
+	levels := []LogLevel{DEBUG, INFO, WARNING, ERROR}
 	expected := []string{"debug", "info", "warning", "error"}
 
 	for i, level := range levels {
 		want := expected[i]
 		got := level.String()
-
-		if got != want {
-			t.Errorf("got %q, wanted %q", got, want)
-		}
-	}
-}
-
-func TestSetDebugLevel(t *testing.T) {
-	defer SetLevel(defaultLevel)
-	levels := []LoggingLevel{DEBUG, INFO, WARNING, ERROR}
-
-	for _, want := range levels {
-		SetLevel(want)
-		got := currentLevel
-
-		if got != want {
-			t.Errorf("got %q, wanted %q", got, want)
-		}
-	}
-}
-
-func TestDefaultLevel(t *testing.T) {
-	want := DEBUG
-	got := currentLevel
-
-	if got != want {
-		t.Errorf("got %q, wanted %q", got, want)
-	}
-}
-
-func TestGetLevel(t *testing.T) {
-	defer SetLevel(defaultLevel)
-
-	levels := []LoggingLevel{DEBUG, INFO, WARNING, ERROR}
-
-	for _, want := range levels {
-		SetLevel(want)
-		got := Level()
 
 		if got != want {
 			t.Errorf("got %q, wanted %q", got, want)
