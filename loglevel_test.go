@@ -24,30 +24,129 @@ func TestStringer(t *testing.T) {
 	}
 }
 
-// func TestDebug(t *testing.T) {
-// 	// Temporarily changing output so we can compare results
-// 	log.Default().SetOutput()
-// }
+func logString(level LogLevel, format string, v ...interface{}) (string, error) {
+	defer Logger().SetOutput(log.Default().Writer())
+	var buf bytes.Buffer
+	Logger().SetOutput(&buf)
+
+	Output(level, format, v...)
+
+	bytes, err := io.ReadAll(&buf)
+	if err != nil {
+		return "", err
+	}
+
+	return string(bytes), nil
+}
 
 func TestOutput(t *testing.T) {
-	defer log.SetOutput(log.Default().Writer())
-	defer log.SetFlags(log.Default().Flags())
-
-	// TODO: clean this mess
-
-	var buf = new(bytes.Buffer)
-	log.SetOutput(buf)
-	log.SetFlags(0)
-
-	Output(ERROR, "test %s", "test2")
-	want := "error:test test2\n"
-	bytes, err := io.ReadAll(buf)
+	want := "debug:test1 test2\n"
+	got, err := logString(DEBUG, "test1 %s", "test2")
 	if err != nil {
-		t.Errorf("Can't read from buffer: %s", err.Error())
+		t.Errorf("can't read from test output:%s", err)
 	}
-	got := string(bytes)
 
 	if got != want {
 		t.Errorf("got %q, wanted %q", got, want)
+	}
+}
+
+func TestDebugLevel(t *testing.T) {
+	defer SetLevel(defaultLevel)
+	SetLevel(DEBUG)
+
+	levels := []LogLevel{DEBUG, INFO, WARNING, ERROR}
+	shouldProduce := []string{
+		"debug:debug output\n",
+		"info:info output\n",
+		"warning:warning output\n",
+		"error:error output\n",
+	}
+
+	for i, level := range levels {
+		want := shouldProduce[i]
+		got, err := logString(level, "%s output", level.String())
+		if err != nil {
+			t.Error(err)
+		}
+
+		if got != want {
+			t.Errorf("%d. got %q, wanted %q", i, got, want)
+		}
+	}
+}
+
+func TestInfoLevel(t *testing.T) {
+	defer SetLevel(defaultLevel)
+	SetLevel(INFO)
+
+	levels := []LogLevel{DEBUG, INFO, WARNING, ERROR}
+	shouldProduce := []string{
+		"",
+		"info:info output\n",
+		"warning:warning output\n",
+		"error:error output\n",
+	}
+
+	for i, level := range levels {
+		want := shouldProduce[i]
+		got, err := logString(level, "%s output", level.String())
+		if err != nil {
+			t.Error(err)
+		}
+
+		if got != want {
+			t.Errorf("%d. got %q, wanted %q", i, got, want)
+		}
+	}
+}
+
+func TestWarningLevel(t *testing.T) {
+	defer SetLevel(defaultLevel)
+	SetLevel(WARNING)
+
+	levels := []LogLevel{DEBUG, INFO, WARNING, ERROR}
+	shouldProduce := []string{
+		"",
+		"",
+		"warning:warning output\n",
+		"error:error output\n",
+	}
+
+	for i, level := range levels {
+		want := shouldProduce[i]
+		got, err := logString(level, "%s output", level.String())
+		if err != nil {
+			t.Error(err)
+		}
+
+		if got != want {
+			t.Errorf("%d. got %q, wanted %q", i, got, want)
+		}
+	}
+}
+
+func TestErrorLevel(t *testing.T) {
+	defer SetLevel(defaultLevel)
+	SetLevel(ERROR)
+
+	levels := []LogLevel{DEBUG, INFO, WARNING, ERROR}
+	shouldProduce := []string{
+		"",
+		"",
+		"",
+		"error:error output\n",
+	}
+
+	for i, level := range levels {
+		want := shouldProduce[i]
+		got, err := logString(level, "%s output", level.String())
+		if err != nil {
+			t.Error(err)
+		}
+
+		if got != want {
+			t.Errorf("%d. got %q, wanted %q", i, got, want)
+		}
 	}
 }
