@@ -19,7 +19,6 @@ const (
 	// to at least have a look what happened
 	WARNING
 	// ERROR is a logging level at which something would likely crash your program
-	// Default Go `Fatal` and `Panic` log calls also falls in this category
 	ERROR
 )
 

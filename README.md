@@ -2,19 +2,50 @@
 
 `LogLevels` is a simple package for implementing logging levels inspired by Python default logging package.
 
-It's for those who think that importing [Logrus]([https://github.com/sirupsen/logrus]) to their project just for splitting DEBUG/INFO logs is a bit of an overkill.
-
+It's for those who think that using [Logrus]([https://github.com/sirupsen/logrus]) for their project just for splitting DEBUG/INFO logs is a bit of an overkill.
+This package doesn't implement `Fatal` and `Panic` functions
 ## Installation
 
-TODO
+```
+go get github.com/Ravcii/LogLevels
+```
+
+## Importing
+
+```go
+import log "github.com/Ravcii/LogLevels"
+```
 
 ## Logging levels
 
-There are 6 logging levels (4 from Python, 2 Go-specific)
+There are 4 logging levels
 
-* `DEBUG` - Debug leve
-* `INFO` - Info level
-* `WARNING` - Warning level
-* `ERROR` - Error level
-* `FATAL` - Go-specific FATAL level, calls `os.exit(1)` after printing
-* `PANIC` - Go-specific FATAL level, calls `panic()` after printing
+* `log.DEBUG` is the lowest logging level. Only devs should really care about it
+* `log.INFO` is a logging level for what's outputting what's happening right now in your code, but not as detailed as DEBUG
+* `log.WARNING` is a logging level at which your program still runs but you want to at least wanna check what happened
+* `log.ERROR` is a logging level at which something would likely crash your program
+
+## Usage
+
+### Levels
+Use `SetLevel(level)` for settings a level.
+
+Use `Level()` for getting a current level.
+
+### Log Functions
+There are 8 functions, 2 per each level for normal string and formatted string:
+* `Debug()`, `Debugf()`
+* `Info()`, `Infof()`
+* `Warning()`, `Warningf()`
+* `Error()`, `Errorf()`
+
+ ### Changing default settings, changing writer, etc...
+
+You can use `Logger()` to get default logger from the original go's `log` package.
+
+Example:
+```go
+var buf bytes.Buffer
+
+log.Logger().SetWriter(&buf)
+```
